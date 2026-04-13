@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Enablement Vault | Odoo Enterprise CS</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   HOW TO UPDATE THIS FILE:
+   
+   1. Scroll down to the <script> section at the bottom
+   2. Find the VAULT_DATA array
+   3. To change a resource status: change "planned" to "next" or "built"
+   4. To add a new resource: copy an existing item block and edit
+   5. To add a link: add a "link" field like: link: "https://your-url.com"
+   6. Save the file and push to GitHub -- that's it!
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+::selection { background: #714B67; color: white; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(165deg, #F8F5F7 0%, #F2EDF0 40%, #EDE7EB 100%);
+  color: #2D2D2D;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.vault-header {
+  background: linear-gradient(135deg, #714B67 0%, #5C3D55 60%, #4A3147 100%);
+  padding: 36px 32px 32px;
+  position: relative;
+  overflow: hidden;
+}
+.vault-header::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -40px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.vault-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: 30%;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.03);
+}
+.header-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+.header-eyebrow {
+  font-size: 11px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.header-title {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 34px; font-weight: 700;
+  color: white; letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.header-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+}
+.stats-bar {
+  display: flex; gap: 24px; margin-top: 24px;
+  flex-wrap: wrap; align-items: flex-end;
+}
+.stat-block { text-align: center; }
+.stat-value {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 28px; font-weight: 700; line-height: 1;
+}
+.stat-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.45);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+.progress-wrap {
+  flex: 1; min-width: 160px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.progress-bar {
+  height: 8px; border-radius: 4px;
+  overflow: hidden; display: flex;
+  background: rgba(255,255,255,0.1);
+}
+.progress-built { background: #81C784; transition: width 0.5s; }
+.progress-next { background: #FFB74D; transition: width 0.5s; }
+.progress-pct {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 4px; text-align: right;
+}
+
+/* Controls */
+.controls-wrap {
+  max-width: 900px; margin: 0 auto;
+  padding: 20px 16px 0;
+  display: flex; gap: 12px; align-items: center;
+  flex-wrap: wrap;
+}
+.search-wrap { position: relative; flex: 1; min-width: 220px; }
+.search-icon {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%);
+  color: #999; font-size: 15px; pointer-events: none;
+}
+.search-input {
+  width: 100%; padding: 11px 14px 11px 40px;
+  border-radius: 10px; border: 1px solid #DDD;
+  font-size: 14px; font-family: 'DM Sans', sans-serif;
+  background: white; outline: none;
+  transition: border 0.15s, box-shadow 0.15s;
+}
+.search-input:focus {
+  border-color: #714B67;
+  box-shadow: 0 0 0 3px rgba(113,75,103,0.1);
+}
+.filter-btns { display: flex; gap: 6px; }
+.filter-btn {
+  padding: 8px 16px; border-radius: 8px;
+  border: 1.5px solid #DDD; background: white;
+  color: #666; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.filter-btn:hover { border-color: #714B67; color: #714B67; }
+.filter-btn.active {
+  border-color: #714B67; background: #714B67; color: white;
+}
+
+/* Sections */
+.sections-wrap {
+  max-width: 900px; margin: 0 auto;
+  padding: 20px 16px 48px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.section-card {
+  background: white; border-radius: 14px;
+  border: 1px solid #EDE7EB; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(113,75,103,0.06);
+  transition: box-shadow 0.2s;
+}
+.section-header {
+  padding: 20px 24px; cursor: pointer;
+  transition: background 0.15s;
+}
+.section-header:hover { background: #FDFCFD; }
+.section-header.expanded { background: #FAF7F9; border-bottom: 1px solid #EDE7EB; }
+.section-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 16px;
+}
+.section-icon { font-size: 22px; }
+.section-title {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 18px; font-weight: 700; color: #2D2D2D;
+  margin: 0;
+}
+.section-subtitle {
+  margin: 4px 0 0 32px; font-size: 13px; color: #888;
+}
+.section-arrow {
+  font-size: 18px; color: #714B67;
+  transition: transform 0.25s;
+  margin-top: 4px; flex-shrink: 0;
+}
+.section-arrow.expanded { transform: rotate(180deg); }
+.section-progress { margin-top: 14px; margin-left: 32px; }
+.section-bar {
+  display: flex; height: 6px; border-radius: 3px;
+  overflow: hidden; background: #ECEFF1;
+}
+.section-counts {
+  display: flex; gap: 16px; margin-top: 6px;
+  font-size: 11px; font-family: 'JetBrains Mono', monospace;
+}
+.count-built { color: #43A047; }
+.count-next { color: #FB8C00; }
+.count-planned { color: #90A4AE; }
+.count-total { color: #AAA; margin-left: auto; }
+
+/* Items */
+.vault-item {
+  border-bottom: 1px solid #EDE7EB;
+  cursor: pointer; transition: background 0.15s;
+}
+.vault-item:last-child { border-bottom: none; }
+.vault-item:hover { background: #FDFCFD; }
+.vault-item.open { background: #FAF7F9; }
+.item-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px; gap: 12px;
+}
+.item-left {
+  display: flex; align-items: center;
+  gap: 12px; flex: 1; min-width: 0;
+}
+.item-arrow {
+  color: #714B67; font-size: 14px; font-weight: 500;
+  transition: transform 0.2s; flex-shrink: 0;
+}
+.item-arrow.open { transform: rotate(90deg); }
+.item-name {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 14.5px; color: #2D2D2D; font-weight: 500;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.5px;
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+}
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.status-built { background: #E8F5E9; color: #2E7D32; }
+.status-built .status-dot { background: #43A047; }
+.status-next { background: #FFF3E0; color: #E65100; }
+.status-next .status-dot { background: #FB8C00; }
+.status-planned { background: #ECEFF1; color: #78909C; }
+.status-planned .status-dot { background: #90A4AE; }
+
+/* Item detail */
+.item-detail {
+  padding: 0 20px 16px 46px;
+  animation: fadeIn 0.2s ease;
+}
+.item-desc {
+  font-size: 13px; line-height: 1.65; color: #555; margin: 0;
+}
+.item-link {
+  display: inline-block; margin-top: 10px;
+  padding: 6px 16px; border-radius: 6px;
+  background: #714B67; color: white; border: none;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.item-link:hover { background: #5C3D55; }
+
+/* Empty */
+.empty-state {
+  text-align: center; padding: 48px; color: #999;
+  font-size: 15px;
+}
+
+/* Footer */
+.vault-footer {
+  text-align: center; padding: 24px 0 0;
+  font-size: 12px; color: #AAA;
+  font-family: 'JetBrains Mono', monospace;
+  border-top: 1px solid #E0D8DD;
+  margin-top: 8px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .header-title { font-size: 26px; }
+  .stats-bar { gap: 16px; }
+  .stat-value { font-size: 22px; }
+  .controls-wrap { flex-direction: column; }
+  .filter-btns { width: 100%; }
+  .filter-btn { flex: 1; text-align: center; }
+  .section-title { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div id="vault-root"></div>
+
+<script>
+// ============================================================
+// VAULT DATA - EDIT THIS TO UPDATE THE VAULT
+// 
+// To update a status: change "planned" to "next" or "built"
+// To add a link: add link: "https://your-url.com" to any item
+// To add a new item: copy an existing { } block and modify it
+// To add a new section: copy an existing section block
+// ============================================================
+
+const VAULT_DATA = [
+  {
+    id: "playbooks",
+    title: "Day-to-Day Client Management Playbooks",
+    subtitle: "Situational plays for the moments that matter most in the client lifecycle",
+    icon: "\u{1F4CB}",
+    items: [
+      { name: "The First 90 Days Playbook", status: "next", desc: "Structured onboarding cadence from contract signature through go-live. Week-by-week milestones, check-in templates, success criteria, and escalation triggers." },
+      { name: "Renewal & Expansion Playbook", status: "next", desc: "When to start the renewal conversation (120 days out), how to build the business case for expansion, upsell signals, and pricing objection handling." },
+      { name: "Churn Risk Detection & Intervention Guide", status: "next", desc: "Early warning signals (QuickBooks retention, low logins, ticket spikes, missed QBRs). Tiered intervention framework: yellow/orange/red with specific actions at each level." },
+      { name: "Success Pack Expectation Setting Guide", status: "next", desc: "How to frame Success Packs so clients understand coaching/knowledge transfer vs. implementation partner work. Prevents the #1 support complaint." },
+      { name: "QuickBooks Migration Conversation Guide", status: "built", desc: "Talk track for full QB-to-Odoo migration. Churn risk framing, connector warning, Intuit pricing vulnerabilities, and 90-day parallel cutover plan.", link: "#" },
+      { name: "QBR / Business Review Template & Guide", status: "planned", desc: "Slide template, data pull checklist, narrative structure, and follow-up cadence. Turns QBRs from status updates into strategic conversations." },
+      { name: "Escalation Management Playbook", status: "planned", desc: "When and how to escalate. Internal routing (Support vs. Engineering vs. Partner). Communication templates and post-mortem framework." },
+      { name: "Upgrade Conversation Playbook", status: "planned", desc: "Proactive version upgrade discussions. Timing guidance, risk framing for older versions, partner coordination, and the AI/feature narrative for v19+." },
+      { name: "Partner Coordination Playbook", status: "planned", desc: "Working with implementation partners. When to recommend, which partners by use case/region, and how to intervene when relationships fail." },
+    ]
+  },
+  {
+    id: "competitive",
+    title: "Competitive Intelligence & Battle Cards",
+    subtitle: "Head-to-head comparisons, enterprise-tier vs. enterprise-tier",
+    icon: "\u2694\uFE0F",
+    items: [
+      { name: "ERP Landscape Report (Master Reference)", status: "built", desc: "Comprehensive $73B market analysis. 11 competitors profiled, market share data, buying trends, friction points, and top 5 selling points. Enterprise-only framing.", link: "#" },
+      { name: "Salesforce vs. Odoo Enterprise", status: "built", desc: "Pricing tables, 5-year TCO ($925K-$1.8M vs. $103K-$168K), CRM depth reframes, and migration talking points for active deals.", link: "#" },
+      { name: "QuickBooks vs. Odoo Enterprise", status: "built", desc: "Churn prevention framing. Dual-system cost analysis, connector warning, Intuit pricing exploitation, and migration playbook.", link: "#" },
+      { name: "AI Conversation Guide", status: "built", desc: "CSM guide for proactively introducing AI capabilities. Pain-point mapping, v19 upgrade bridge, Claude/Odoo.sh positioning, competitor AI pricing comparison.", link: "#" },
+      { name: "Oracle NetSuite vs. Odoo Enterprise", status: "next", desc: "Financial consolidation depth vs. TCO. Key for mid-market deals evaluating NetSuite's multi-entity capabilities." },
+      { name: "Microsoft Dynamics 365 vs. Odoo Enterprise", status: "next", desc: "Microsoft ecosystem lock-in narrative. For deals where the client is a heavy M365/Teams/Azure shop and Copilot is landing." },
+      { name: "Zoho One vs. Odoo Enterprise", status: "planned", desc: "SMB deals where Zoho's simplicity is the draw. Reframe around depth, customization, and scalability ceiling." },
+      { name: "SAP Business One vs. Odoo Enterprise", status: "planned", desc: "Regulated industries and SAP subsidiary deals. Brand trust reframe and implementation timeline comparison." },
+      { name: "Sage Intacct vs. Odoo Enterprise", status: "planned", desc: "CFO-driven deals where accounting depth is primary. AICPA endorsement reframe, breadth vs. depth positioning." },
+      { name: "Acumatica vs. Odoo Enterprise", status: "planned", desc: "Unlimited-user pricing model. For deals where headcount scaling is the client's primary concern." },
+    ]
+  },
+  {
+    id: "product",
+    title: "Product Knowledge & Release Updates",
+    subtitle: "Digested product updates written for CS, not engineering",
+    icon: "\u{1F9E0}",
+    items: [
+      { name: "Odoo Enterprise Pricing Cheat Sheet", status: "next", desc: "Quick-reference pricing card with Standard/Custom tiers, Success Pack costs, and common pricing objection responses." },
+      { name: "Odoo v19 Feature Digest for CS", status: "planned", desc: "CS-friendly v19 summary by module with client impact ratings and suggested talk tracks. AI App, Studio AI fields, NL server actions, UX overhaul." },
+      { name: "Odoo v19.2 Release Notes Digest", status: "planned", desc: "Incremental release digest. What changed, which clients are affected, and whether it warrants proactive outreach." },
+      { name: "Odoo v20 Roadmap Breakdown", status: "planned", desc: "Partner Day roadmap translated for CS. What to tell clients who ask 'what's next' and how to reinforce platform commitment." },
+      { name: "Module Deep Dives (Series)", status: "planned", desc: "One-pagers for Accounting, Manufacturing, Inventory/WMS, HR/Payroll, eCommerce, Helpdesk. Capabilities, limitations, and competitive positioning." },
+      { name: "Odoo.sh vs. Odoo Online Decision Guide", status: "planned", desc: "When to recommend each hosting option. Client profiles, technical requirements, cost comparison, and migration paths." },
+    ]
+  },
+  {
+    id: "onboarding",
+    title: "New CSM Onboarding & Ramp",
+    subtitle: "From day one to independently managing a book of business",
+    icon: "\u{1F680}",
+    items: [
+      { name: "CSM 30-60-90 Day Ramp Plan", status: "planned", desc: "Week-by-week learning path. What to study, who to shadow, which clients to observe, when to take first solo calls, and competency checkpoints." },
+      { name: "Odoo Product Crash Course Outline", status: "planned", desc: "Curated learning path through Odoo training resources and eLearning. Priority: Accounting > CRM > Inventory > Manufacturing > HR." },
+      { name: "\"How We Work\" Guide", status: "planned", desc: "Internal processes, tools, and norms. CRM hygiene, Slack channels, escalation paths, who to go to for what, and meeting cadences." },
+      { name: "Client Handoff Checklist", status: "planned", desc: "Standardized checklist for CSM-to-CSM transitions. Context documentation, incoming CSM briefing, and client-facing introduction." },
+      { name: "Common Client Questions & Answers Bank", status: "planned", desc: "Living FAQ of frequent client questions with approved answers. Pricing, upgrades, integrations, limitations, hosting, support tiers." },
+    ]
+  }
+];
+
+// ============================================================
+// RENDERING ENGINE - You shouldn't need to edit below this line
+// ============================================================
+
+const STATUS_LABELS = { built: "BUILT", next: "NEXT UP", planned: "PLANNED" };
+
+function getStatusHTML(status) {
+  return `<span class="status-badge status-${status}"><span class="status-dot"></span>${STATUS_LABELS[status]}</span>`;
+}
+
+let expandedSections = new Set(["playbooks"]);
+let openItems = new Set();
+let currentSearch = "";
+let currentFilter = "all";
+
+function countByStatus(items, status) {
+  return items.filter(i => i.status === status).length;
+}
+
+function render() {
+  const allItems = VAULT_DATA.flatMap(s => s.items);
+  const totalAll = allItems.length;
+  const totalBuilt = countByStatus(allItems, "built");
+  const totalNext = countByStatus(allItems, "next");
+  const totalPlanned = countByStatus(allItems, "planned");
+  const builtPct = ((totalBuilt / totalAll) * 100).toFixed(0);
+  const nextPct = ((totalNext / totalAll) * 100).toFixed(0);
+
+  const filteredSections = VAULT_DATA.map(section => ({
+    ...section,
+    items: section.items.filter(item => {
+      const q = currentSearch.toLowerCase();
+      const matchSearch = !q || item.name.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q);
+      const matchFilter = currentFilter === "all" || item.status === currentFilter;
+      return matchSearch && matchFilter;
+    })
+  })).filter(s => s.items.length > 0);
+
+  let html = `
+  <div class="vault-header">
+    <div class="header-inner">
+      <div class="header-eyebrow">Odoo Enterprise</div>
+      <h1 class="header-title">The Enablement Vault</h1>
+      <p class="header-sub">Customer Success Enablement Index &nbsp;&middot;&nbsp; v1.0 &nbsp;&middot;&nbsp; April 2026</p>
+      <div class="stats-bar">
+        <div class="stat-block">
+          <div class="stat-value" style="color:rgba(255,255,255,0.9)">${totalAll}</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-value" style="color:#81C784">${totalBuilt}</div>
+          <div class="stat-label">Built</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-value" style="color:#FFB74D">${totalNext}</div>
+          <div class="stat-label">Next Up</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-value" style="color:rgba(255,255,255,0.5)">${totalPlanned}</div>
+          <div class="stat-label">Planned</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar">
+            <div class="progress-built" style="width:${builtPct}%"></div>
+            <div class="progress-next" style="width:${nextPct}%"></div>
+          </div>
+          <div class="progress-pct">${builtPct}% complete</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls-wrap">
+    <div class="search-wrap">
+      <span class="search-icon">\u{1F50D}</span>
+      <input class="search-input" type="text" placeholder="Search resources..." value="${currentSearch}" oninput="handleSearch(this.value)">
+    </div>
+    <div class="filter-btns">
+      ${["all","built","next","planned"].map(f =>
+        `<button class="filter-btn ${currentFilter === f ? 'active' : ''}" onclick="handleFilter('${f}')">${f === "all" ? "All" : f === "next" ? "Next Up" : f.charAt(0).toUpperCase() + f.slice(1)}</button>`
+      ).join("")}
+    </div>
+  </div>
+
+  <div class="sections-wrap">`;
+
+  if (filteredSections.length === 0) {
+    html += `<div class="empty-state">No resources match your search.</div>`;
+  }
+
+  filteredSections.forEach(section => {
+    const isExpanded = expandedSections.has(section.id);
+    const sBuilt = countByStatus(section.items, "built");
+    const sNext = countByStatus(section.items, "next");
+    const sPlanned = countByStatus(section.items, "planned");
+    const sTotal = section.items.length;
+    const sBPct = ((sBuilt / sTotal) * 100).toFixed(1);
+    const sNPct = ((sNext / sTotal) * 100).toFixed(1);
+
+    html += `
+    <div class="section-card">
+      <div class="section-header ${isExpanded ? 'expanded' : ''}" onclick="toggleSection('${section.id}')">
+        <div class="section-top">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+              <span class="section-icon">${section.icon}</span>
+              <h2 class="section-title">${section.title}</h2>
+            </div>
+            <p class="section-subtitle">${section.subtitle}</p>
+          </div>
+          <span class="section-arrow ${isExpanded ? 'expanded' : ''}">\u25BC</span>
+        </div>
+        <div class="section-progress">
+          <div class="section-bar">
+            <div class="progress-built" style="width:${sBPct}%"></div>
+            <div class="progress-next" style="width:${sNPct}%"></div>
+          </div>
+          <div class="section-counts">
+            <span class="count-built">${sBuilt} built</span>
+            <span class="count-next">${sNext} next</span>
+            <span class="count-planned">${sPlanned} planned</span>
+            <span class="count-total">${sTotal} total</span>
+          </div>
+        </div>
+      </div>`;
+
+    if (isExpanded) {
+      section.items.forEach((item, i) => {
+        const key = `${section.id}-${i}`;
+        const isOpen = openItems.has(key);
+        html += `
+      <div class="vault-item ${isOpen ? 'open' : ''}" onclick="toggleItem('${key}')">
+        <div class="item-row">
+          <div class="item-left">
+            <span class="item-arrow ${isOpen ? 'open' : ''}">\u25B6</span>
+            <span class="item-name">${item.name}</span>
+          </div>
+          ${getStatusHTML(item.status)}
+        </div>
+        ${isOpen ? `
+        <div class="item-detail">
+          <p class="item-desc">${item.desc}</p>
+          ${item.link ? `<a class="item-link" href="${item.link}" target="_blank">Open Document \u2192</a>` : ''}
+        </div>` : ''}
+      </div>`;
+      });
+    }
+
+    html += `</div>`;
+  });
+
+  html += `
+    <div class="vault-footer">
+      Maintained by CS Enablement &nbsp;&middot;&nbsp; Last updated April 2026 &nbsp;&middot;&nbsp; Requests via #enablement
+    </div>
+  </div>`;
+
+  document.getElementById('vault-root').innerHTML = html;
+}
+
+function toggleSection(id) {
+  expandedSections.has(id) ? expandedSections.delete(id) : expandedSections.add(id);
+  render();
+}
+
+function toggleItem(key) {
+  openItems.has(key) ? openItems.delete(key) : openItems.add(key);
+  render();
+}
+
+function handleSearch(val) {
+  currentSearch = val;
+  render();
+  // Restore cursor position
+  const input = document.querySelector('.search-input');
+  if (input) { input.focus(); input.setSelectionRange(val.length, val.length); }
+}
+
+function handleFilter(f) {
+  currentFilter = f;
+  render();
+}
+
+// Initial render
+render();
+</script>
+</body>
+</html>
