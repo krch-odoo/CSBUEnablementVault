@@ -2096,9 +2096,9 @@ const VAULT_DATA = [
     subtitle: "Head-to-head comparisons, enterprise-tier vs. enterprise-tier",
     icon: "⚔️",
     items: [
-      { name: "ERP Landscape Report (Master Reference)", status: "built", desc: "Comprehensive $73B market analysis. 11 competitors profiled, market share data, buying trends, friction points, and top 5 selling points. Enterprise-only framing.", battleCard: "erp" },
-      { name: "Salesforce vs. Odoo Enterprise", status: "built", desc: "Pricing tables, 5-year TCO ($925K–$1.8M vs. $103K–$168K), CRM depth reframes, and migration talking points for active deals.", battleCard: "sf" },
-      { name: "QuickBooks vs. Odoo Enterprise", status: "built", desc: "Churn prevention framing. Dual-system cost analysis, connector warning, Intuit pricing exploitation, and migration playbook.", battleCard: "qb" },
+      { name: "ERP Landscape Report (Master Reference)", status: "built", desc: "Comprehensive $73B market analysis. 11 competitors profiled, market share data, buying trends, friction points, and top 5 selling points. Enterprise-only framing.", battleCard: "erp", reportType: "report" },
+      { name: "Salesforce vs. Odoo Enterprise", status: "built", desc: "Pricing tables, 5-year TCO ($925K–$1.8M vs. $103K–$168K), CRM depth reframes, and migration talking points for active deals.", battleCard: "sf", reportType: "battlecard" },
+      { name: "QuickBooks vs. Odoo Enterprise", status: "built", desc: "Churn prevention framing. Dual-system cost analysis, connector warning, Intuit pricing exploitation, and migration playbook.", battleCard: "qb", reportType: "battlecard" },
       { name: "AI Conversation Guide", status: "built", desc: "CSM guide for proactively introducing AI capabilities. Pain-point mapping, v19 upgrade bridge, Claude/Odoo.sh positioning, competitor AI pricing comparison." },
       { name: "Oracle NetSuite vs. Odoo Enterprise", status: "next", desc: "Financial consolidation depth vs. TCO. Key for mid-market deals evaluating NetSuite's multi-entity capabilities." },
       { name: "Microsoft Dynamics 365 vs. Odoo Enterprise", status: "next", desc: "Microsoft ecosystem lock-in narrative. For deals where the client is a heavy M365/Teams/Azure shop and Copilot is landing." },
@@ -2325,7 +2325,10 @@ function render() {
         <div class="item-detail">
           <p class="item-desc">${item.desc}</p>
           <div class="item-actions">
-            ${item.battleCard ? `<button class="item-btn primary" onclick="event.stopPropagation(); openModal('${item.battleCard}')">⚔️ Open Card</button><button class="item-btn secondary" onclick="event.stopPropagation(); printCard('${item.battleCard}')">🖨️ Save as PDF</button>` : ''}
+            ${item.battleCard ? (item.reportType === 'report'
+              ? `<button class="item-btn primary" onclick="event.stopPropagation(); openModal('${item.battleCard}')">📊 Open Report</button><button class="item-btn secondary" onclick="event.stopPropagation(); printCard('${item.battleCard}')">🖨️ Save as PDF</button>`
+              : `<button class="item-btn primary" onclick="event.stopPropagation(); openModal('${item.battleCard}')">⚔️ Open Battle Card</button><button class="item-btn secondary" onclick="event.stopPropagation(); printCard('${item.battleCard}')">🖨️ Save as PDF</button>`)
+              : ''}
           </div>
         </div>` : ''}
       </div>`;
