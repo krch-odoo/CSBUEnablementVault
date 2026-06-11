@@ -2325,7 +2325,7 @@ function render() {
         <div class="item-detail">
           <p class="item-desc">${item.desc}</p>
           <div class="item-actions">
-            ${item.battleCard ? `<button class="item-btn primary" onclick="event.stopPropagation(); openModal('${item.battleCard}')">⚔️ Open Battle Card</button><button class="item-btn secondary" onclick="event.stopPropagation(); printCard('${item.battleCard}')">🖨️ Save as PDF</button>` : ''}
+            ${item.battleCard ? `<button class="item-btn primary" onclick="event.stopPropagation(); openModal('${item.battleCard}')">⚔️ Open Card</button><button class="item-btn secondary" onclick="event.stopPropagation(); printCard('${item.battleCard}')">🖨️ Save as PDF</button>` : ''}
           </div>
         </div>` : ''}
       </div>`;
